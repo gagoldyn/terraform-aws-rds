@@ -18,19 +18,19 @@ variable "custom_iam_instance_profile" {
 variable "allocated_storage" {
   description = "The allocated storage in gigabytes"
   type        = string
-  default     = null
+  default     = 400
 }
 
 variable "storage_type" {
   description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io1' or 'gp3' , you must also include a value for the 'iops' parameter"
   type        = string
-  default     = null
+  default     = gp3
 }
 
 variable "storage_throughput" {
   description = "Storage throughput value for the DB instance. See `notes` for limitations regarding this variable for `gp3`"
   type        = number
-  default     = null
+  default     = 500
 }
 
 variable "storage_encrypted" {
@@ -84,13 +84,13 @@ variable "domain_iam_role_name" {
 variable "engine" {
   description = "The database engine to use"
   type        = string
-  default     = null
+  default     = mariadb
 }
 
 variable "engine_version" {
   description = "The engine version to use"
   type        = string
-  default     = null
+  default     = 10.6.12
 }
 
 variable "skip_final_snapshot" {
@@ -120,7 +120,7 @@ variable "final_snapshot_identifier_prefix" {
 variable "instance_class" {
   description = "The instance type of the RDS instance"
   type        = string
-  default     = null
+  default     = db.m52xlarge
 }
 
 variable "db_name" {
@@ -132,7 +132,7 @@ variable "db_name" {
 variable "username" {
   description = "Username for the master DB user"
   type        = string
-  default     = null
+  default     = admin
 }
 
 variable "password" {
@@ -166,13 +166,13 @@ variable "availability_zone" {
 variable "multi_az" {
   description = "Specifies if the RDS instance is multi-AZ"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "iops" {
   description = "The amount of provisioned IOPS. Setting this implies a storage_type of 'io1' or `gp3`. See `notes` for limitations regarding this variable for `gp3`"
   type        = number
-  default     = null
+  default     = gp3
 }
 
 variable "publicly_accessible" {
@@ -348,7 +348,7 @@ variable "create_db_parameter_group" {
 variable "parameter_group_name" {
   description = "Name of the DB parameter group to associate or create"
   type        = string
-  default     = null
+  default     = codedx-mariadb-recommendation
 }
 
 variable "parameter_group_use_name_prefix" {
@@ -360,7 +360,7 @@ variable "parameter_group_use_name_prefix" {
 variable "parameter_group_description" {
   description = "Description of the DB parameter group to create"
   type        = string
-  default     = null
+  default     = "DB Parameter Group named codedx-mariadb-recommendation"
 }
 
 variable "family" {
@@ -372,7 +372,11 @@ variable "family" {
 variable "parameters" {
   description = "A list of DB parameters (map) to apply"
   type        = list(map(string))
-  default     = []
+  default     = [- optimizer_search_depth=0
+- character_set_server=utf8mb4
+- collation_server=utf8mb4_general_ci
+- lower_case_table_names=1
+- log_bin_trust_function_creators=1]
 }
 
 # DB option group
@@ -481,7 +485,7 @@ variable "performance_insights_kms_key_id" {
 variable "max_allocated_storage" {
   description = "Specifies the value for Storage Autoscaling"
   type        = number
-  default     = 0
+  default     = 1000
 }
 
 variable "ca_cert_identifier" {
